@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Photoelectric Effect Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>Advanced Photoelectric Effect Simulator</h1>
+            <p>Research-grade precision • Real-time measurements • Publication-quality graphs</p>
+        </header>
+
+        <main class="app-main">
+            <!-- Left Panel - Controls -->
+            <div class="control-panel">
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Experiment Controls</h3>
+                        <div class="precision-indicator">
+                            <span class="status status--success">High Precision Mode</span>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="form-group">
+                            <label class="form-label" for="material-select">Photocathode Material</label>
+                            <select id="material-select" class="form-control">
+                                <option value="0">Cesium (Cs) - 2.10 eV</option>
+                                <option value="1">Sodium (Na) - 2.28 eV</option>
+                                <option value="2">Potassium (K) - 2.30 eV</option>
+                                <option value="3">Aluminum (Al) - 4.08 eV</option>
+                                <option value="4">Copper (Cu) - 4.70 eV</option>
+                                <option value="5">Silver (Ag) - 4.73 eV</option>
+                                <option value="6">Gold (Au) - 5.10 eV</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="wavelength-slider">
+                                Wavelength: <span id="wavelength-value">400</span> nm
+                            </label>
+                            <input type="range" id="wavelength-slider" class="form-control" 
+                                   min="100" max="700" value="400" step="1">
+                            <div class="wavelength-display">
+                                Frequency: <span id="frequency-value">749.5</span> THz
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="intensity-slider">
+                                Intensity: <span id="intensity-value">5</span> W/m²
+                            </label>
+                            <input type="range" id="intensity-slider" class="form-control" 
+                                   min="1" max="10" value="5" step="0.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="area-slider">
+                                Area: <span id="area-value">0.10</span> cm²
+                            </label>
+                            <input type="range" id="area-slider" class="form-control" 
+                                   min="0.01" max="1.00" step="0.01" value="0.10">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="voltage-slider">
+                                Applied Voltage: <span id="voltage-value">0.00</span> V
+                            </label>
+                            <input type="range" id="voltage-slider" class="form-control" 
+                                   min="-5" max="5" step="0.01" value="0">
+                        </div>
+
+                        <div class="measurement-info">
+                            <div class="measurement-stat">
+                                <span>Measurements per point:</span>
+                                <strong>1000</strong>
+                            </div>
+                            <div class="measurement-stat">
+                                <span>Standard Error:</span>
+                                <strong id="std-error">0.00%</strong>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button id="switch-light" class="btn btn--primary btn--full-width btn--lg">
+                                💡 Switch On Light
+                            </button>
+                            <button id="reset-experiment" class="btn btn--secondary btn--full-width mt-8">
+                                🔄 Reset Experiment
+                            </button>
+                            <button id="export-data" class="btn btn--outline btn--full-width mt-8">
+                                📊 Export All Data (CSV)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Panel - Energy Level Diagram -->
+            <div class="energy-diagram-panel">
+                <div class="card">
+                    <div class="card__header">
+                        <h3>Energy Level Diagram</h3>
+                        <div class="status-indicators">
+                            <div id="emission-status" class="status status--error">No Emission</div>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="energy-diagram-container">
+                            <canvas id="energy-diagram" width="600" height="400"></canvas>
+                            <div class="energy-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color photon-energy"></div>
+                                    <span>Photon Energy (E = hf)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color work-function"></div>
+                                    <span>Work Function (φ)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color kinetic-energy"></div>
+                                    <span>Max Kinetic Energy</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="energy-values">
+                            <div class="energy-value">
+                                <label>Photon Energy (hf):</label>
+                                <span id="photon-energy-value">3.10 eV</span>
+                            </div>
+                            <div class="energy-value">
+                                <label>Work Function (φ):</label>
+                                <span id="work-function-value">2.10 eV</span>
+                            </div>
+                            <div class="energy-value">
+                                <label>Max KE (hf - φ):</label>
+                                <span id="max-ke-value">1.00 eV</span>
+                            </div>
+                            <div class="energy-value">
+                                <label>Threshold λ:</label>
+                                <span id="threshold-wavelength">590.9 nm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Animation Panel -->
+                <div class="card mt-16">
+                    <div class="card__header">
+                        <h3>Photoelectric Setup Animation</h3>
+                    </div>
+                    <div class="card__body">
+                        <div class="setup-container">
+                            <canvas id="setup-diagram" width="600" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Graphs & Data -->
+            <div class="results-panel">
+                <div class="card">
+                    <div class="card__header">
+                        <h3>I-V Characteristic Curve</h3>
+                        <div class="graph-controls">
+                            <button id="clear-graph" class="btn btn--sm btn--secondary">Clear</button>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="chart-container">
+                            <canvas id="iv-chart" height="250"></canvas>
+                        </div>
+                        <div class="calculated-values">
+                            <div class="calc-value">
+                                <label>Stopping Potential:</label>
+                                <span id="stopping-potential">0.000000 V</span>
+                            </div>
+                            <div class="calc-value">
+                                <label>Current (Mean):</label>
+                                <span id="current-value">0.000000 μA</span>
+                            </div>
+                            <div class="calc-value">
+                                <label>Current (Std Dev):</label>
+                                <span id="current-std">0.000000 μA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="card__header">
+                        <h3>Real-time Measurements</h3>
+                        <div class="measurement-status">
+                            <span id="measurement-count">0</span> measurements
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="measurement-display">
+                            <div class="current-reading">
+                                <div class="reading-label">Live Current Reading</div>
+                                <div class="reading-value" id="live-current">0.000000 μA</div>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table id="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Voltage (V)</th>
+                                        <th>Mean Current (μA)</th>
+                                        <th>Std Error (μA)</th>
+                                        <th>Measurements</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-16">
+                    <div class="card__header">
+                        <h3>Experiment Log</h3>
+                    </div>
+                    <div class="card__body">
+                        <div id="experiment-log" class="experiment-log">
+                            <div class="log-entry">
+                                <span class="log-time">Ready</span>
+                                <span class="log-message">Photoelectric effect simulator initialized</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
